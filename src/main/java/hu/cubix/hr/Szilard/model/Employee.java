@@ -1,6 +1,5 @@
 package hu.cubix.hr.Szilard.model;
 
-import javax.lang.model.element.Name;
 import java.time.LocalDateTime;
 
 public class Employee {
@@ -9,26 +8,22 @@ public class Employee {
 
 
 
-    private String name ;
+    private String name;
     private String job;
-    private Integer salary;
-    private LocalDateTime startDate;
+    private int salary;
+    private LocalDateTime startedWorkingAt;
 
-    public Employee(String name,Long id, String job, Integer salary, LocalDateTime startDate) {
+
+    public Employee(Long id,String name , String job, int salary, LocalDateTime startedWorkingAt) {
+
         this.id = id;
+        this.name = name;
         this.job = job;
         this.salary = salary;
-        this.startDate = startDate;
-        this.name = name;
+        this.startedWorkingAt = startedWorkingAt;
     }
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
     public Long getId() {
         return id;
     }
@@ -37,27 +32,43 @@ public class Employee {
         this.id = id;
     }
 
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
     public String getJob() {
+
         return job;
     }
 
     public void setJob(String job) {
+
         this.job = job;
     }
 
-    public Integer getSalary() {
+    public int getSalary() {
+
         return salary;
     }
 
-    public void setSalary(Integer salary) {
+    public void setSalary(int salary) {
+
         this.salary = salary;
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
+    public LocalDateTime getStartedWorkingAt() {
+
+        return startedWorkingAt;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
+    public void setStartedWorkingAt(LocalDateTime startedWorkingAt) {
+
+        this.startedWorkingAt = startedWorkingAt;
     }
+
+
 }
