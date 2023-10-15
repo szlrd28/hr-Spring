@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1> List of employees </h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Név</th>
+        <th>Munka</th>
+        <th>Fizetés</th>
+        <th>Kezdés</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="employee : ${employees}">
+        <td th:text="${employee.id}"></td>
+        <td th:text="${employee.name}"></td>
+        <td th:text="${employee.job}"></td>
+        <td th:text="${employee.salary}"></td>
+        <td th:text="${employee.startedWorkingAt}"></td>
+    </tr>
+    </tbody>
+</table>
+
+
+<form th:action="@{/employees}" method="post" th:object="${newEmployee}">
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <br>
+    <label for="job">Job:</label>
+    <input type="text" id="job" name="job" required>
+    <br>
+    <label for="salary">Salary:</label>
+    <input type="number" id="salary" name="salary" required>
+    <br><br>
+    <input type="submit" value="Create">
+</form>
+
+
+</body>
+</html>

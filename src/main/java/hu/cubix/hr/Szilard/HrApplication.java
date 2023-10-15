@@ -8,11 +8,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
 @SpringBootApplication
-//@EnableConfigurationProperties(SmartEmployeeProperties.class)
+//@RestController
 public class HrApplication implements CommandLineRunner {
 
 	private final SalaryService salaryService;
