@@ -20,7 +20,7 @@
     <tbody>
     <tr th:each="employee : ${employees}">
         <td th:text="${employee.id}"></td>
-        <td th:text="${employee.name}"></td>
+        <td><a th:href="@{'/employees/edit/' + ${employee.id}}" th:text="${employee.name}"></a></td>
         <td th:text="${employee.job}"></td>
         <td th:text="${employee.salary}"></td>
         <td th:text="${employee.startedWorkingAt}"></td>
@@ -31,17 +31,17 @@
 
 <form th:action="@{/employees}" method="post" th:object="${newEmployee}">
 
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
+   Id: <input th:field="*{id}"><br>
+    Name: <input th:field="*{name}">
     <br>
-    <label for="job">Job:</label>
-    <input type="text" id="job" name="job" required>
+    Job: <input th:field="*{job}">
     <br>
-    <label for="salary">Salary:</label>
-    <input type="number" id="salary" name="salary" required>
-    <br><br>
+    Salary: <input th:field="*{salary}"><br>
+    Entry: <input th:field="*{startedWorkingAt}">
+    <br>
     <input type="submit" value="Create">
 </form>
+
 
 
 </body>
