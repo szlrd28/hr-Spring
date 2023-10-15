@@ -67,6 +67,12 @@ public class EmployeeTLController {
         return "redirect:/employees";
     }
 
+    @GetMapping("/employees/delete/{id}")
+    public String deleteEmployee(@PathVariable Long id, Map<String, Object> model) {
+        allEmployees.removeIf(employee -> employee.getId().equals(id));
+        model.put("employees", allEmployees);
+        return "redirect:/employees";
+    }
 
 
     }

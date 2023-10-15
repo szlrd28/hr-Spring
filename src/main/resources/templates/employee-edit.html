@@ -6,7 +6,6 @@
 </head>
 <body>
 <form th:action="@{/employees/update}" method="post" th:object="${employee}">
-    <!-- Hidden field for ID to identify which employee to update -->
     <input type="hidden" th:field="*{id}">
 
     Name: <input th:field="*{name}"><br>

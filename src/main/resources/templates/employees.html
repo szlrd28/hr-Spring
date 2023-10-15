@@ -15,6 +15,7 @@
         <th>Munka</th>
         <th>Fizetés</th>
         <th>Kezdés</th>
+        <th>Töröl</th>
     </tr>
     </thead>
     <tbody>
@@ -24,6 +25,7 @@
         <td th:text="${employee.job}"></td>
         <td th:text="${employee.salary}"></td>
         <td th:text="${employee.startedWorkingAt}"></td>
+        <td><a th:href="@{'/employees/delete/' + ${employee.id}}">Töröl</a></td>
     </tr>
     </tbody>
 </table>
