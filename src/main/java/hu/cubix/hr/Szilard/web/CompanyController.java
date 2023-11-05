@@ -1,60 +1,96 @@
 package hu.cubix.hr.Szilard.web;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import hu.cubix.hr.Szilard.dto.CompanyDto;
 import hu.cubix.hr.Szilard.dto.EmployeeDto;
+import hu.cubix.hr.Szilard.dto.Views;
+import hu.cubix.hr.Szilard.mapper.CompanyMapper;
+import hu.cubix.hr.Szilard.model.Company;
+import hu.cubix.hr.Szilard.service.CompanyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/companies")
 public class CompanyController {
 
-    private List<CompanyDto> allCompanies = new ArrayList<>();
-    //private Map<Long, EmployeeDto> allCompanies = new HashMap<>();
-    List<EmployeeDto> employeesList = new ArrayList<>();
-    {
-        allCompanies.add(new CompanyDto(1,221, "Ferenc Liszt Airport", "BUDAPEST", employeesList));
-    }
+    @Autowired
+    private CompanyService companyService;
 
-//Az összes alkalmazott visszaadása
+    @Autowired
+    private CompanyMapper companyMapper;
+
+    //1. megoldás: CompanyDto lemásolásával, de employees kivételével
     @GetMapping
-    public ResponseEntity<List<CompanyDto>> getAllCompanies() {
-        return new ResponseEntity<>(allCompanies, HttpStatus.OK);
-    }
-    //Adott id-jű alkalmazott visszaadása
-    @GetMapping("/{id}")
-    public ResponseEntity<CompanyDto> getCompanyById(@PathVariable int id) {
-        CompanyDto companyDto = allCompanies.get(id);
-        if(companyDto != null)
-            return ResponseEntity.ok(companyDto);
-        else
-            return ResponseEntity.notFound().build();
-
-    }
-//   Új alkalmazott felvétele
-    @PostMapping
-    public ResponseEntity<CompanyDto> addCompany(@RequestBody CompanyDto companyDto) {
-        allCompanies.add(companyDto);
-        return new ResponseEntity<>(companyDto, HttpStatus.CREATED);
-    }
-    //Meglévő alkalmazott módosítására
-    @PutMapping("/{id}")
-    public ResponseEntity<CompanyDto> updateCompany(@PathVariable int id, @RequestBody CompanyDto companyDto) {
-        if (id >= 0 && id < allCompanies.size()) {
-            companyDto.setId(id);
-            allCompanies.set(id, companyDto);
-            return ResponseEntity.ok(companyDto);
+    public List<CompanyDto> findAll(@RequestParam Optional<Boolean> full){
+        List<Company> companies = companyService.findAll();
+        if(full.orElse(false)) {
+            return companyMapper.companiesToDtos(companies);
+        } else {
+            return companyMapper.companiesToSummaryDtos(companies);
         }
-        return ResponseEntity.notFound().build();
     }
- //Meglévő alkalmazott törlésére•
+
+
+    @GetMapping("/{id}")
+    public CompanyDto findById(@PathVariable long id, @RequestParam Optional<Boolean> full) {
+        Company company = getCompanyOrThrow(id);
+        if(full.orElse(false)) {
+            return companyMapper.companyToDto(company);
+        } else {
+            return companyMapper.companyToSummaryDto(company);
+        }
+    }
+
+    @PostMapping
+    public CompanyDto create(@RequestBody CompanyDto companyDto) {
+        return companyMapper.companyToDto(companyService.save(companyMapper.dtoToCompany(companyDto)));
+    }
+
+
+    @PutMapping("/{id}")
+    public CompanyDto update(@PathVariable long id, @RequestBody CompanyDto companyDto) {
+        companyDto.setId(id);
+        Company updatedCompany = companyService.update(companyMapper.dtoToCompany(companyDto));
+        if (updatedCompany == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        return companyMapper.companyToDto(updatedCompany);
+    }
+
     @DeleteMapping("/{id}")
-    public void deleteCompany(@PathVariable int id) {
-        allCompanies.remove(id);
+    public void delete(@PathVariable long id) {
+        companyService.delete(id);
+    }
+
+    @PostMapping("/{id}/employees")
+    public CompanyDto addNewEmployee(@PathVariable long id, @RequestBody EmployeeDto employeeDto) {
+        Company company = companyService.addEmployee(id, companyMapper.dtoToEmployee(employeeDto));
+        return companyMapper.companyToDto(company);
+    }
+
+    @DeleteMapping("/{id}/employees/{employeeId}")
+    public CompanyDto deleteEmployeeFromCompany(@PathVariable long id, @PathVariable long employeeId){
+        Company company = companyService.deleteEmployee(id, employeeId);
+        return companyMapper.companyToDto(company);
+    }
+
+    @PutMapping("/{id}/employees")
+    public CompanyDto replaceEmployees(@PathVariable long id, @RequestBody List<EmployeeDto> newEmployees) {
+        Company company = companyService.replaceEmployees(id, companyMapper.dtosToEmployees(newEmployees));
+        return companyMapper.companyToDto(company);
+    }
+
+
+    private Company getCompanyOrThrow(long id) {
+        return companyService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
 

@@ -2,49 +2,45 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>HR application</title>
 </head>
 <body>
-<h1> List of employees </h1>
+
+<h1>List of employees</h1>
 
 <table border="1">
     <thead>
     <tr>
         <th>Id</th>
-        <th>Név</th>
-        <th>Munka</th>
-        <th>Fizetés</th>
-        <th>Kezdés</th>
-        <th>Töröl</th>
+        <th>Name</th>
+        <th>Title</th>
+        <th>Salary</th>
+        <th>Entry date</th>
     </tr>
     </thead>
+
     <tbody>
     <tr th:each="employee : ${employees}">
-        <td th:text="${employee.id}"></td>
-        <td><a th:href="@{'/employees/edit/' + ${employee.id}}" th:text="${employee.name}"></a></td>
-        <td th:text="${employee.job}"></td>
-        <td th:text="${employee.salary}"></td>
-        <td th:text="${employee.startedWorkingAt}"></td>
-        <td><a th:href="@{'/employees/delete/' + ${employee.id}}">Töröl</a></td>
+        <td th:text="${employee.employeeId}">Id</td>
+        <td><a th:href="@{/employees/{id}(id = ${employee.employeeId})}" th:text="${employee.name}">Name</a></td>
+        <td th:text="${employee.jobTitle}">Title</td>
+        <td th:text="${employee.salary}">Salary</td>
+        <td th:text="${employee.dateOfStartWork}">EntryDate</td>
+        <td><a th:href="@{/deleteEmployee/{id}(id=${employee.employeeId})}">Delete</a></td>
     </tr>
     </tbody>
 </table>
-
+<br>
+<br>
 
 <form th:action="@{/employees}" method="post" th:object="${newEmployee}">
-
-   Id: <input th:field="*{id}"><br>
-    Name: <input th:field="*{name}">
-    <br>
-    Job: <input th:field="*{job}">
-    <br>
-    Salary: <input th:field="*{salary}"><br>
-    Entry: <input th:field="*{startedWorkingAt}">
-    <br>
-    <input type="submit" value="Create">
+    Id: <input th:field="*{employeeId}" /><br>
+    Name: <input th:field="*{name}" /><br>
+    Title: <input th:field="*{jobTitle}" /><br>
+    Salary: <input th:field="*{salary}" /><br>
+    Entry date: <input th:field="*{dateOfStartWork}" /><br>
+    <input type="submit" value="Add" />
 </form>
-
-
 
 </body>
 </html>

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 @Profile("smart")
-public class SmartConfiguration {
+public class SmartSalaryConfiguration {
 
     @Bean
     public EmployeeService employeeService() {

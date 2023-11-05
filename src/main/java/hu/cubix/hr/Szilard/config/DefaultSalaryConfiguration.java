@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 @Profile("!smart")
-public class DefaultConfiguration {
+public class DefaultSalaryConfiguration {
 
     @Bean
     public EmployeeService employeeService() {

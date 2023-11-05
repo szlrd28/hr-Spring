@@ -1,37 +1,46 @@
 package hu.cubix.hr.Szilard.dto;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class CompanyDto {
 
 
-    private int id;
+    @JsonView(Views.BaseData.class)
+    private Long id;
+    @JsonView(Views.BaseData.class)
     private int registrationNumber;
+    @JsonView(Views.BaseData.class)
     private String name;
+    @JsonView(Views.BaseData.class)
     private String address;
-    private List<EmployeeDto> employees;
 
-    public CompanyDto(){}
-    public CompanyDto(int id, int registrationNumber, String name, String address, List<EmployeeDto> employees) {
+    private List<EmployeeDto> employees = new ArrayList<>();
+
+    public CompanyDto() {
+
+    }
+
+    public CompanyDto(Long id, int registrationNumber, String name, String adress, List<EmployeeDto> employees) {
+        this.id = id;
         this.registrationNumber = registrationNumber;
         this.name = name;
-        this.address = address;
+        this.address = adress;
         this.employees = employees;
-    }
-
-    public CompanyDto(CompanyDto company) {
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getRegistrationNumber() {
         return registrationNumber;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setRegistrationNumber(int registrationNumber) {

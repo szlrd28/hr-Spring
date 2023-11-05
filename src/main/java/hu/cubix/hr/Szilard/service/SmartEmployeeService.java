@@ -3,31 +3,36 @@ package hu.cubix.hr.Szilard.service;
 
 
 import hu.cubix.hr.Szilard.model.Employee;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import hu.cubix.hr.Szilard.config.HrConfigProperties;
+import hu.cubix.hr.Szilard.config.HrConfigProperties.Smart;
 
 @Service
-public class SmartEmployeeService implements EmployeeService {
+public class SmartEmployeeService extends AbstractEmployeeService {
 
-    @Value("${smartemployee.years.limits}")
-    private List<Double> yearLimits;
-
-    @Value("${smartemployee.raise.percents}")
-    private List<Integer> raisePercents;
+    @Autowired
+    HrConfigProperties config;
 
     @Override
     public int getPayRaisePercent(Employee employee) {
-        long yearsWorked = ChronoUnit.YEARS.between(employee.getStartedWorkingAt(), LocalDateTime.now());
 
-        for (int i = 0; i < yearLimits.size(); i++) {
-            if (yearsWorked >= yearLimits.get(i)) {
-                return raisePercents.get(i);
-            }
-        }
-        return 0;
+        double yearsWorked = ChronoUnit.DAYS.between(employee.getDateOfStartWork(), LocalDateTime.now()) / 365.0;
+
+        Smart smartConfig = config.getSalary().getSmart();
+
+        TreeMap<Double, Integer> limits = smartConfig.getLimits();
+
+        Map.Entry<Double, Integer> floorEntry = limits.floorEntry(yearsWorked);
+        return floorEntry == null ? 0 : floorEntry.getValue();
+
     }
 }

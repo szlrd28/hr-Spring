@@ -1,33 +1,57 @@
 package hu.cubix.hr.Szilard.dto;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Positive;
+
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EmployeeDto {
 
-    private Long id;
-    private String name;
-    private String job;
-    private int salary;
-    private LocalDateTime startedWorkingAt;
 
-    public EmployeeDto(){
+    private long id;
+
+    @NotNull(message = "A név nem lehet null")
+    @NotEmpty(message = "A név nem lehet üres")
+    private String name;
+
+
+    @NotNull(message = "A munkakör megnevezése nem lehet null")
+    @NotEmpty(message = "A munkakör megnevezése nem lehet üres")
+    private String title;
+
+
+
+    @NotNull(message = "A fizetés nem lehet null")
+    @Positive(message = "A fizetésnek pozitívnak kell lennie")
+    private int salary;
+
+    @NotNull(message = "A belépési dátum nem lehet null")
+    @Past(message = "A belépési dátumnak a múltban kell lennie")
+    private LocalDateTime entryDate;
+
+    public EmployeeDto() {
 
     }
 
-    public EmployeeDto(Long id, String name, String job, int salary, LocalDateTime startedWorkingAt) {
-        super();
+    public EmployeeDto(long id, String name, String title, int salary, LocalDateTime entryDate) {
         this.id = id;
         this.name = name;
-        this.job = job;
+        this.title = title;
         this.salary = salary;
-        this.startedWorkingAt = startedWorkingAt;
+        this.entryDate = entryDate;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -39,12 +63,12 @@ public class EmployeeDto {
         this.name = name;
     }
 
-    public String getJob() {
-        return job;
+    public String getTitle() {
+        return title;
     }
 
-    public void setJob(String job) {
-        this.job = job;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public int getSalary() {
@@ -55,11 +79,18 @@ public class EmployeeDto {
         this.salary = salary;
     }
 
-    public LocalDateTime getStartedWorkingAt() {
-        return startedWorkingAt;
+    public LocalDateTime getEntryDate() {
+        return entryDate;
     }
 
-    public void setStartedWorkingAt(LocalDateTime startedWorkingAt) {
-        this.startedWorkingAt = startedWorkingAt;
+    public void setEntryDate(LocalDateTime entryDate) {
+        this.entryDate = entryDate;
     }
+
+    @Override
+    public String toString() {
+        return "Employee [id=" + id + ", name=" + name + ", title=" + title + ", salary=" + salary + ", entryDate="
+                + entryDate + "]";
+    }
+
 }

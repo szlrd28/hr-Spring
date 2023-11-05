@@ -1,37 +1,54 @@
 package hu.cubix.hr.Szilard.model;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+@Entity
 public class Employee {
 
-    private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-
-
+    private Long employeeId;
     private String name;
-    private String job;
+    private String jobTitle;
     private int salary;
-    private LocalDateTime startedWorkingAt;
+    private LocalDateTime dateOfStartWork;
 
 
-    public Employee(Long id,String name , String job, int salary, LocalDateTime startedWorkingAt) {
 
-        this.id = id;
+    @ManyToOne
+    private Company company;
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public Employee() {
+    }
+
+    public Employee(Long employeeId, String name, String jobTitle, int salary, LocalDateTime dateOfStartWork) {
+        this.employeeId = employeeId;
         this.name = name;
-        this.job = job;
+        this.jobTitle = jobTitle;
         this.salary = salary;
-        this.startedWorkingAt = startedWorkingAt;
+        this.dateOfStartWork = dateOfStartWork;
     }
 
-
-    public Long getId() {
-        return id;
+    public Employee(int salary, LocalDateTime dateOfStartWork) {
+        this.salary = salary;
+        this.dateOfStartWork = dateOfStartWork;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long getEmployeeId() {
+        return employeeId;
     }
 
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
+    }
 
     public String getName() {
         return name;
@@ -40,35 +57,45 @@ public class Employee {
     public void setName(String name) {
         this.name = name;
     }
-    public String getJob() {
 
-        return job;
+    public String getJobTitle() {
+        return jobTitle;
     }
 
-    public void setJob(String job) {
-
-        this.job = job;
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 
     public int getSalary() {
-
         return salary;
     }
 
     public void setSalary(int salary) {
-
         this.salary = salary;
     }
 
-    public LocalDateTime getStartedWorkingAt() {
-
-        return startedWorkingAt;
+    public LocalDateTime getDateOfStartWork() {
+        return dateOfStartWork;
     }
 
-    public void setStartedWorkingAt(LocalDateTime startedWorkingAt) {
-
-        this.startedWorkingAt = startedWorkingAt;
+    public void setDateOfStartWork(LocalDateTime dateOfStartWork) {
+        this.dateOfStartWork = dateOfStartWork;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Employee employee = (Employee) o;
+        return employeeId.equals(employee.employeeId);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(employeeId);
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
 }
