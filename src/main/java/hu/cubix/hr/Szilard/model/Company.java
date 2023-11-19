@@ -12,7 +12,7 @@ public class Company {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
     private int registrationNumber;
     private String name;
@@ -21,7 +21,8 @@ public class Company {
     @OneToMany(mappedBy = "company")
     private List<Employee> employees;
 
-
+    @ManyToOne
+    private CompanyType companyType;
 
     public Company() {
 
@@ -97,5 +98,13 @@ public class Company {
             return false;
         Company other = (Company) obj;
         return Objects.equals(id, other.id);
+    }
+
+    public CompanyType getCompanyType() {
+        return companyType;
+    }
+
+    public void setCompanyType(CompanyType companyType) {
+        this.companyType = companyType;
     }
 }

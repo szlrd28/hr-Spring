@@ -1,15 +1,31 @@
 package hu.cubix.hr.Szilard.web;
 
-import com.fasterxml.jackson.annotation.JsonView;
+
 import hu.cubix.hr.Szilard.dto.CompanyDto;
 import hu.cubix.hr.Szilard.dto.EmployeeDto;
-import hu.cubix.hr.Szilard.dto.Views;
+
 import hu.cubix.hr.Szilard.mapper.CompanyMapper;
+import hu.cubix.hr.Szilard.mapper.EmployeeMapper;
+import hu.cubix.hr.Szilard.model.AverageSalaryByPosition;
 import hu.cubix.hr.Szilard.model.Company;
+import hu.cubix.hr.Szilard.repository.CompanyRepository;
 import hu.cubix.hr.Szilard.service.CompanyService;
+import hu.cubix.hr.Szilard.service.SalaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,23 +35,41 @@ import java.util.*;
 @RequestMapping("/api/companies")
 public class CompanyController {
 
+
     @Autowired
     private CompanyService companyService;
 
     @Autowired
     private CompanyMapper companyMapper;
 
+    @Autowired
+    CompanyRepository companyRepository;
+
+    @Autowired
+    SalaryService salaryService;
+
     //1. megoldás: CompanyDto lemásolásával, de employees kivételével
     @GetMapping
     public List<CompanyDto> findAll(@RequestParam Optional<Boolean> full){
         List<Company> companies = companyService.findAll();
-        if(full.orElse(false)) {
-            return companyMapper.companiesToDtos(companies);
-        } else {
-            return companyMapper.companiesToSummaryDtos(companies);
-        }
+        return mapCompanies(companies, full);
     }
 
+    //2. megoldás: JsonView-val
+//	@GetMapping(params = "full=true")
+//	public List<CompanyDto> findAllWithEmployees(){
+//		return new ArrayList<>(companies.values());
+//	}
+//
+//	@GetMapping
+//	@JsonView(Views.BaseData.class)
+//	public List<CompanyDto> findAllWithoutEmployees(){
+//		return new ArrayList<>(companies.values());
+//	}
+//
+//	private CompanyDto mapCompanyWithoutEmployeees(CompanyDto c) {
+//		return new CompanyDto(c.getId(), c.getRegistrationNumber(), c.getName(), c.getAddress(), null);
+//	}
 
     @GetMapping("/{id}")
     public CompanyDto findById(@PathVariable long id, @RequestParam Optional<Boolean> full) {
@@ -87,10 +121,43 @@ public class CompanyController {
         return companyMapper.companyToDto(company);
     }
 
+    @GetMapping(params = "aboveSalary")
+    public List<CompanyDto> getCompaniesAboveSalary(@RequestParam int aboveSalary,
+                                                    @RequestParam Optional<Boolean> full) {
+        List<Company> filteredCompanies = companyRepository.findByEmployeeWithSalaryHigherThan(aboveSalary);
+        return mapCompanies(filteredCompanies, full);
+    }
+
+    @GetMapping(params = "aboveEmployeeCount")
+    public List<CompanyDto> getCompaniesAboveEmployeeCount(@RequestParam int aboveEmployeeCount,
+                                                           @RequestParam Optional<Boolean> full) {
+        List<Company> filteredCompanies = companyRepository.findByEmployeeCountHigherThan(aboveEmployeeCount);
+        return mapCompanies(filteredCompanies, full);
+    }
+
+    @GetMapping("/{id}/salaryStats")
+    public List<AverageSalaryByPosition> getSalaryStatsById(@PathVariable long id) {
+        return companyRepository.findAverageSalariesByPosition(id);
+    }
+
+    @PutMapping("/{id}/raiseMinSalary/{positionName}/{minSalary}")
+    public void raiseMinSalary(@PathVariable long id, @PathVariable String positionName,
+                               @PathVariable int minSalary) {
+        salaryService.raiseMinSalary(positionName, minSalary, id);
+    }
+
 
     private Company getCompanyOrThrow(long id) {
         return companyService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    private List<CompanyDto> mapCompanies(List<Company> companies, Optional<Boolean> full) {
+        if(full.orElse(false)) {
+            return companyMapper.companiesToDtos(companies);
+        } else {
+            return companyMapper.companiesToSummaryDtos(companies);
+        }
     }
 
 

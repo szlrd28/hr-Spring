@@ -7,32 +7,26 @@ import java.util.Objects;
 
 @Entity
 public class Employee {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-
+    @GeneratedValue
     private Long employeeId;
     private String name;
-    private String jobTitle;
+    //	private String jobTitle;
     private int salary;
     private LocalDateTime dateOfStartWork;
-
-
 
     @ManyToOne
     private Company company;
 
-    public Company getCompany() {
-        return company;
-    }
+    @ManyToOne
+    private Position position;
 
     public Employee() {
     }
 
-    public Employee(Long employeeId, String name, String jobTitle, int salary, LocalDateTime dateOfStartWork) {
+    public Employee(Long employeeId, String name, int salary, LocalDateTime dateOfStartWork) {
         this.employeeId = employeeId;
         this.name = name;
-        this.jobTitle = jobTitle;
         this.salary = salary;
         this.dateOfStartWork = dateOfStartWork;
     }
@@ -58,14 +52,6 @@ public class Employee {
         this.name = name;
     }
 
-    public String getJobTitle() {
-        return jobTitle;
-    }
-
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
-    }
-
     public int getSalary() {
         return salary;
     }
@@ -83,19 +69,35 @@ public class Employee {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Employee employee = (Employee) o;
-        return employeeId.equals(employee.employeeId);
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(employeeId);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Employee other = (Employee) obj;
+        return Objects.equals(employeeId, other.employeeId);
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
 }

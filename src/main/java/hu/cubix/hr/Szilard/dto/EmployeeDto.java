@@ -15,25 +15,16 @@ public class EmployeeDto {
 
 
     private long id;
-
-    @NotNull(message = "A név nem lehet null")
-    @NotEmpty(message = "A név nem lehet üres")
+    @NotEmpty
     private String name;
-
-
-    @NotNull(message = "A munkakör megnevezése nem lehet null")
-    @NotEmpty(message = "A munkakör megnevezése nem lehet üres")
+    @NotEmpty
     private String title;
-
-
-
-    @NotNull(message = "A fizetés nem lehet null")
-    @Positive(message = "A fizetésnek pozitívnak kell lennie")
+    @Positive
     private int salary;
-
-    @NotNull(message = "A belépési dátum nem lehet null")
-    @Past(message = "A belépési dátumnak a múltban kell lennie")
+    @Past
     private LocalDateTime entryDate;
+
+    private CompanyDto company;
 
     public EmployeeDto() {
 
@@ -92,5 +83,11 @@ public class EmployeeDto {
         return "Employee [id=" + id + ", name=" + name + ", title=" + title + ", salary=" + salary + ", entryDate="
                 + entryDate + "]";
     }
+    public CompanyDto getCompany() {
+        return company;
+    }
 
+    public void setCompany(CompanyDto company) {
+        this.company = company;
+    }
 }

@@ -9,6 +9,9 @@ import hu.cubix.hr.Szilard.repository.EmployeeRepository;
 import hu.cubix.hr.Szilard.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +24,6 @@ import java.util.*;
 @RequestMapping("/api/employees")
 public class EmployeeController {
 
-    private Map<Long, EmployeeDto> employees = new HashMap<>();
-
     @Autowired
     private EmployeeService employeeService;
 
@@ -32,16 +33,34 @@ public class EmployeeController {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    //minSalary paraméter kezelése, 1. megoldás
+//	@GetMapping
+//	public List<EmployeeDto> findAll() {
+//		return new ArrayList<>(employees.values());
+//	}
+//
+//	@GetMapping(params = "minSalary")
+//	public List<EmployeeDto> findBySalary(@RequestParam int minSalary){
+//		return employees.values().stream().filter(e -> e.getSalary() > minSalary).toList();
+//	}
+
+    //minSalary paraméter kezelése, 2. megoldás
     @GetMapping
-    public List<EmployeeDto> findAll(Optional<Integer> minSalary) {
+    public List<EmployeeDto> findAll(Optional<Integer> minSalary, @SortDefault("employeeId") Pageable pageable /*page, size, sort*/) {
         List<Employee> employees = null;
         if (minSalary.isPresent()) {
-            employees = employeeRepository.findBySalaryGreaterThan(minSalary.get());
+            Page<Employee> page = employeeRepository.findBySalaryGreaterThan(minSalary.get(), pageable);
+            System.out.println(page.getTotalElements());
+            System.out.println(page.isFirst());
+            System.out.println(page.isLast());
+            System.out.println(page.getNumberOfElements());
+            employees = page.getContent();
         } else {
             employees = employeeService.findAll();
         }
         return employeeMapper.employeesToDtos(employees);
     }
+
 
     @GetMapping("/{id}")
     public EmployeeDto findById(@PathVariable long id) {
@@ -51,6 +70,7 @@ public class EmployeeController {
     private Employee findByIdOrThrow(long id) {
         return employeeService.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
+
     @PostMapping
     public EmployeeDto create(@RequestBody @Valid EmployeeDto employeeDto) {
         return employeeMapper.employeeToDto(employeeService.save(employeeMapper.dtoToEmployee(employeeDto)));
@@ -58,7 +78,7 @@ public class EmployeeController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeDto> update(@PathVariable long id,@Valid @RequestBody EmployeeDto employeeDto) {
+    public ResponseEntity<EmployeeDto> update(@PathVariable long id, @Valid @RequestBody EmployeeDto employeeDto) {
         employeeDto.setId(id);
         Employee updatedEmployee = employeeService.update(employeeMapper.dtoToEmployee(employeeDto));
         if (updatedEmployee == null) {
@@ -70,7 +90,7 @@ public class EmployeeController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
-        employees.remove(id);
+        employeeService.delete(id);
     }
 
     @PostMapping("/payRaise")

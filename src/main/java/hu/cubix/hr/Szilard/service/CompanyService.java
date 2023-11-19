@@ -18,7 +18,7 @@ public class CompanyService {
     private CompanyRepository companyRepository;
 
     @Autowired
-    private EmployeeRepository employeeRepository;
+    private EmployeeService employeeService;
 
     public Company save(Company company) {
         return companyRepository.save(company);
@@ -39,6 +39,15 @@ public class CompanyService {
     }
 
     public void delete(long id) {
+
+        //companyRepository.deleteById(id); --> csak akkor megy, ha nincs employee-ja
+        Optional<Company> company = companyRepository.findById(id);
+        if(company.isPresent()) {
+            company.get().getEmployees().forEach(e -> {
+                e.setCompany(null);
+                employeeService.save(e);
+            });
+        }
         companyRepository.deleteById(id);
     }
 
@@ -46,26 +55,29 @@ public class CompanyService {
     public Company addEmployee(long id, Employee employee) {
         Company company = companyRepository.findById(id).get();
         company.addEmployee(employee);
-        employeeRepository.save(employee);
+        employeeService.save(employee);
         return company;
     }
 
     public Company deleteEmployee(long id, long employeeId) {
         Company company = companyRepository.findById(id).get();
-        Employee employee = employeeRepository.findById(employeeId).get();
+        Employee employee = employeeService.findById(employeeId).get();
         employee.setCompany(null);
         company.getEmployees().remove(employee);
-        employeeRepository.save(employee);
+        employeeService.save(employee);
         return company;
     }
 
     public Company replaceEmployees(long id, List<Employee> employees) {
         Company company = companyRepository.findById(id).get();
-        company.getEmployees().forEach(e -> e.setCompany(null));
+        company.getEmployees().forEach(e -> {
+            e.setCompany(null);
+            employeeService.save(e);
+        });
         company.getEmployees().clear();
         employees.forEach(e -> {
             company.addEmployee(e);
-            employeeRepository.save(e);
+            employeeService.save(e);
         });
         return company;
     }

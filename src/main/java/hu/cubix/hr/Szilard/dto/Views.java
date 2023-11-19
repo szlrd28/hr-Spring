@@ -1,5 +1,5 @@
 package hu.cubix.hr.Szilard.dto;
 
-public class Views {
+public interface Views {
     public class  BaseData{}
 }
